@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" type="text/css" href="layui/css/layui.css"/>
+		<script type="text/javascript" src="layui/layui.js"></script>
+		<style type="text/css">
+		body {
+			position: relative;
+		    height: 100vh;
+		    min-height: 600px;
+		    background: url(imgs/body_bg.png) center no-repeat fixed;
+		    background-size: cover;
+		}
+		.login-body {
+			position: relative;
+		    width: 685px;
+		    margin: 5% auto;
+		    padding: 35px 30px;
+		    color: #666;
+		    border-radius: 4px;
+		    background: rgba(255, 255, 255, 0.8);
+		    box-shadow: 1px 1px 4px #767676;
+		}
+		.text-center {
+			font-size: 1.375rem;
+			margin-bottom: 40px;
+			text-align: center;
+		}
+		.login-form {
+			width: 300px;
+		    margin-right: 52px;
+		    margin-left: 38px;
+		}
+		/* 除去最后一个input标签   */
+		input:not(:last-child) {
+			font-size: 1rem;
+		    line-height: 1.6;
+		    padding: 12px 20px;
+		    transition: all .2s;
+		    color: #666;
+		    border: 1px solid #dce4e6;
+		    border-radius: 3px;
+		    outline: 0;
+		    background: #f3f6f8;
+		    width: 100%;
+		}
+		.tip {
+			color: #e35b5a;
+			height: 30px;
+			line-height: 30px;
+			font-size: 12px;
+		}
+		#register1 {
+			background: #31b968!important;
+			width: 342px!important;
+			height: 48px!important;
+			font-size: 1.5rem!important;
+			color: #fff!important;
+			margin-bottom: 50px!important;
+		}
+		.box-login, .box-register {
+			float: left;
+		}
+		.box-register {
+			width: 220px;
+		    padding-left: 10px;
+		    margin-left: 40px;
+		    border-left: 1px solid #fff;
+		}
+		.gozhuce {
+			margin: 124px 20px;
+		}
+		span {
+			color: #666;
+			font-size: 1.2rem;
+		}
+		a {
+			list-style: none;
+			font-size: 1.7rem;
+			color: #31b968;
+		}
+		a:hover {color: #31b968;}
+		#sendCode {
+			margin-left: 233px!important;
+			margin-bottom: 10px!important;
+		}
+		/*去除number类型输入框上下箭头*/
+		input::-webkit-outer-spin-button,
+		input::-webkit-inner-spin-button {
+			-webkit-appearance: none;
+		}
+		input[type="number"]{
+			-moz-appearance: textfield;
+		}
+		/*下拉框样式*/
+		.com-sel {
+			line-height: 3rem;
+			cursor: pointer;        /*鼠标上移变成小手*/
+		}
+		.com-opt {
+			width: 120px;
+			color: #999;
+			/*去掉默认的下拉三角*/
+			appearance:none;
+			-moz-appearance:none;
+			-webkit-appearance:none;
+			/*添加下拉三角图标*/
+			background: url(imgs/select.jpg) no-repeat right center transparent;
+		}
+		</style>
+		<title>注册</title>
+	</head>
+
+	<body>
+
+		<div class="login-body">
+			<div class="text-center">
+				手机号注册
+			</div>
+			<div class="box">
+				<div class="box-login">
+					<form action="" method="post">
+						<div class="login-form">
+							<input type="number" name="tel" id="tel" placeholder="手机号" autocomplete="off" />
+							<div class="tip usernameTip"></div>
+							<a class="layui-btn" id="sendCode" onclick="sendCode()">发送验证码</a>
+							<input type="text" name="code" id="code" placeholder="验证码" autocomplete="off" />
+							<div class="tip emailTip"></div>
+							<div class="com-sel"><select id="departmentId" class="com-opt">
+								<option value="0">选择部门</option>
+							</select></div>
+							<input type="button" value="注册" class="layui-btn" id="register1" />
+						</div>
+					</form>
+				</div>
+				<div class="box-register">
+					<div class="gozhuce">
+						<span>已经注册过？</span><br>
+						<a href="login.html">立即登陆 →</a>
+					</div>
+				</div>
+				<div class="layui-clear"></div>
+			</div>
+		</div>
+
+	</body>
+<script src="js/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript" src="layer/2.4/layer.js"></script>
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+	$.ajax({
+		url: "staff/findAllDepartment",
+		type: "post",
+		dataType: "json",
+		success: function(data) {
+			console.log(data);
+			$.each(data, function (index, department) {
+				$("#departmentId").append("<option value='" + department.id + "'>" + department.name + "</option>");
+			})
+		}
+	});
+});
+
+//判断输入框是否为空
+$("#tel").blur(function() {
+	var tel = $("#tel").val();
+	if (tel == null || tel == "") {
+	 	$(".usernameTip").html("请输入手机号");
+		$("#tel").css("border-color", "red");
+	 	return;
+	} else {
+	 	$(".usernameTip").html("");
+	 	$.ajax({
+			url: "staff/telExist",
+			type: "post",
+			data: {"tel": tel},
+			dataType: "json",
+			success: function(data) {
+				console.log(data);
+				if ($.trim(data) == $.trim("true")) {
+					$("#tel").css("border-color", "red");
+					$(".usernameTip").html("手机号已存在！");
+				} else {
+					$("#tel").css("border-color", "green");
+					return;
+				}
+			}
+		});
+	}
+});
+
+
+// 验证码是否为空
+$("#code").blur(function() {
+	var code = $("#code").val();
+	if (code == null || code == "") {
+	 	$(".emailTip").html("请输入验证码");
+		$("#code").css("border-color", "red");
+	 	return;
+	} else {
+	 	$(".emailTip").html("");
+		$.ajax({
+			url: "staff/code",
+			type: "post",
+			data: {"code": code},
+			dataType: "json",
+			success: function(data) {
+				console.log(data);
+				if ($.trim(data) == $.trim("false")) {
+					$("#code").css("border-color", "red");
+					$(".emailTip").html("验证码错误！");
+				} else {
+					$("#code").css("border-color", "green");
+					return;
+				}
+			}
+		});
+	}
+
+
+});
+
+
+$(function() {
+	$("input[type=button]").click(function(){
+		// 有不填项时不能提交
+		var tel = $("#tel").val();
+		var code = $("#code").val();
+		if (tel == null || tel == "" || code == null || code == "") {
+			$(".usernameTip").html("请输入手机号");
+			$(".emailTip").html("请输入验证码");
+			$("#tel, #code").css("border-color", "red");
+			return;
+		}
+		
+		$.ajax({
+			url: "staff/register",
+			type: "post",
+			data: {"tel": $("#tel").val(), "code": $("#code").val(), "departmentId": $('#departmentId option:selected').val()},
+			dataType: "json",
+			success: function(data) { // 当后台成功返回时调用本函数
+				console.log(data);
+				if ($.trim(data) == $.trim("false"))
+					layer.msg('注册失败！', {icon: 1, time: 2000});
+				else {
+					//页面层-自定义
+					layer.open({
+						type: 1,
+						area: ['300px', '200px'],
+						fix: false, //不固定
+						maxmin: true,
+						shade:0.4,
+						title: '牢记你的初始密码',
+						content: data
+					});
+				}
+				
+			}
+		});
+	});
+
+});
+
+
+/*发送验证码*/
+function sendCode() {
+	var tel = $("#tel").val();
+	if (tel == null || $.trim(tel) == "") {
+		$(".usernameTip").html("请输入手机号");
+		$("#tel").css("border-color", "red");
+		return;
+	} else {
+		$.ajax({
+			url: "staff/sendCode",
+			post: "post",
+			data: {"tel": tel},
+			dataType: "json",
+			success: function (data) {
+				if (data.length == 6) {
+					layer.msg('发送成功！验证码60秒内有效！', {icon: 1, time: 3000});
+				}
+			},
+			error: function (data) {
+				concole.log(data);
+			}
+		});
+	}
+}
+
+
+</script>
+</html>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hzlei.registerlogin.mapper.RegisterMapper">
+
+    <!--add staff-->
+    <insert id="addStaff" parameterType="staff">
+        insert into staff values(
+            seq_staff_id.nextval, #{tel}, #{password}, #{departmentId}
+        )
+    </insert>
+
+    <!--判断手机号是否存在-->
+    <select id="telExist" resultType="staff">
+        select * from staff where tel = #{tel}
+    </select>
+
+    <!--find all department-->
+    <select id="findAllDepartment" resultType="department">
+        select * from department
+    </select>
+
+    <!--find all staff-->
+    <select id="findAllStaff" resultMap="findallstaff">
+        select st.id sid, st.tel, st.password, de.name
+        from staff st join department de
+        on st.department_id = de.id
+    </select>
+    <resultMap id="findallstaff" type="staff" autoMapping="true">
+        <id property="id" column="sid"></id>
+        <collection property="department" ofType="department" autoMapping="true">
+            <result property="name" column="name"></result>
+        </collection>
+    </resultMap>
+
+</mapper>

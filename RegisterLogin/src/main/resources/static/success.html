@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="layui/css/layui.css"/>
+    <script type="text/javascript" src="layui/layui.js"></script>
+    <title>登陆成功</title>
+</head>
+<body>
+    <h2>登陆成功</h2>
+
+    <table class="layui-table">
+        <colgroup>
+            <col width="150">
+            <col width="200">
+            <col>
+        </colgroup>
+        <thead>
+        <tr>
+            <th>手机号</th>
+            <th>密码</th>
+            <th>职位</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+
+</body>
+<script type="text/javascript" src="layer/2.4/layer.js"></script>
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $.ajax({
+            url: "staff/findAllStaff",
+            type: "post",
+            dataType: "json",
+            success: function(data) {
+                $.each(data, function (index, staff) {
+                    $('tbody').append("<tr>" +
+                        "<td>" + staff.tel + "</td>" +
+                        "<td>" + staff.password + "</td>" +
+                        "<td>" + staff.department.name + "</td>" +
+                        "</tr>");
+                });
+
+            }
+        });
+    });
+    </script>
+</html>
